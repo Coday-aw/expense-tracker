@@ -8,6 +8,18 @@ const transitions = ref(
   JSON.parse(localStorage.getItem("transitions") || "[]")
 );
 
+const income = computed(() =>
+  transitions.value
+    .filter((t) => t.category === "income")
+    .reduce((sum, t) => sum + Number(t.amount), 0)
+);
+
+const expense = computed(() =>
+  transitions.value
+    .filter((t) => t.category === "expense")
+    .reduce((sum, t) => sum + Number(t.amount), 0)
+);
+
 const addTransition = () => {
   if (
     newTransition.value.trim() !== "" &&
@@ -27,30 +39,30 @@ const addTransition = () => {
   }
 };
 
-const income = computed(() =>
-  transitions.value
-    .filter((t) => t.category === "income")
-    .reduce((sum, t) => sum + Number(t.amount), 0)
-);
-
-const expense = computed(() =>
-  transitions.value
-    .filter((t) => t.category === "expense")
-    .reduce((sum, t) => sum + Number(t.amount), 0)
-);
-
 const balance = computed(() => income.value - expense.value);
+
+const deleteTransition = (index) => {
+  const updatedTransitions = transitions.value.filter((_, i) => i !== index);
+  transitions.value = updatedTransitions;
+  localStorage.setItem("transitions", JSON.stringify(updatedTransitions));
+};
 </script>
 
 <template>
   <div class="flex justify-center items-center h-screen">
-    <div class="flex flex-col gap-5 w-[300px]">
-      <h2 class="font-bold text-2xl">Expense Tracker</h2>
-      <div>
+    <div
+      class="flex flex-col gap-5 w-[400px] p-10 bg-blue-50 shadow-lg rounded-lg"
+    >
+      <h2 class="font-bold text-2xl text-center">Expense Tracker</h2>
+      <div
+        class="flex flex-col justify-center items-center bg-white p-2 shadow-sm rounded-sm"
+      >
         <p class="font-medium">YOUR BALANCE</p>
         <P class="font-bold text-2xl">${{ balance }}</P>
       </div>
-      <div class="flex justify-between gap-5 bg-white shadow-sm px-5 py-2">
+      <div
+        class="flex justify-between gap-5 bg-white shadow-sm px-5 py-2 rounded-sm"
+      >
         <div>
           <p>Income</p>
           <p class="text-green-500">${{ income }}</p>
@@ -62,21 +74,24 @@ const balance = computed(() => income.value - expense.value);
         </div>
       </div>
       <div>
-        <p class="font-bold">History</p>
+        <p class="font-bold">Recent transitions</p>
         <div class="h-[2px] bg-gray-300 mb-2"></div>
         <ul>
           <li
             v-for="(transition, index) in transitions"
             :key="index"
             :class="[
-              'flex justify-between border-r-4 p-1 mb-2 bg-white shadow-sm',
+              ' relative group flex justify-between border-r-4 p-1 mb-2 bg-white shadow-sm rounded-sm',
               transition.category === 'expense'
                 ? 'border-red-600'
                 : 'border-green-600',
             ]"
           >
-            <span>
-              <button class="bg-red-600 px-2 text-white hidden hover:block">
+            <span class="flex justify-center items-center">
+              <button
+                @click="deleteTransition(index)"
+                class="absolute left-[-30px] bg-red-600 px-2 py-1 text-white cursor-pointer opacity-0 group-hover:opacity-100"
+              >
                 X
               </button>
               {{ transition.text }}
@@ -96,7 +111,7 @@ const balance = computed(() => income.value - expense.value);
         <form @submit.prevent="addTransition" class="flex flex-col gap-2">
           <label for="newTransition">Text</label>
           <input
-            class="bg-white px-2 py-1"
+            class="bg-white px-2 py-1 rounded-sm"
             type="text"
             placeholder="Enter text"
             name="newTransition"
@@ -105,7 +120,7 @@ const balance = computed(() => income.value - expense.value);
           />
           <label for="amount">Amount</label>
           <input
-            class="bg-white px-2 py-1"
+            class="bg-white px-2 py-1 rounded-sm"
             type="text"
             placeholder="Enter amount"
             name="amount"
