@@ -2,11 +2,11 @@
 import { defineProps } from "vue";
 
 const props = defineProps({
-  transitions: {
+  transactions: {
     type: Array,
     required: true,
   },
-  deleteTransition: {
+  deleteTransaction: {
     type: Function,
     required: true,
   },
@@ -15,32 +15,32 @@ const props = defineProps({
 
 <template>
   <div>
-    <p class="font-bold">Recent transitions</p>
+    <p class="font-bold">Recent transactions</p>
     <div class="h-[2px] bg-gray-300 mb-2"></div>
     <ul>
       <li
-        v-for="(transition, index) in transitions"
+        v-for="(transaction, index) in transactions"
         :key="index"
         :class="[
           ' relative group flex justify-between border-r-4 p-1 mb-2 bg-white shadow-sm rounded-sm',
-          transition.category === 'expense'
+          transaction.category === 'expense'
             ? 'border-red-600'
             : 'border-green-600',
         ]"
       >
         <span class="flex justify-center items-center">
           <button
-            @click="deleteTransition(index)"
+            @click="deleteTransaction(index)"
             class="absolute left-[-30px] bg-red-600 px-2 py-1 text-white cursor-pointer opacity-0 group-hover:opacity-100"
           >
             X
           </button>
-          {{ transition.text }}
+          {{ transaction.text }}
         </span>
 
         <span
-          >{{ transition.category === "expense" ? "-" : "" }} ${{
-            transition.amount
+          >{{ transaction.category === "expense" ? "-" : "" }} ${{
+            transaction.amount
           }}</span
         >
       </li>
